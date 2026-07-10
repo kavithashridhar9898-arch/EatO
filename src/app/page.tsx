@@ -1,65 +1,83 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Hero } from "@/components/home/Hero";
+import { SplashScreen } from "@/components/ui/SplashScreen";
+import { SearchSection } from "@/components/home/SearchSection";
+import { CategorySlider } from "@/components/home/CategorySlider";
+import { RestaurantGrid } from "@/components/home/RestaurantGrid";
+import { RecommendedMeals } from "@/components/home/RecommendedMeals";
+import { AppOrderBar } from "@/components/layout/AppOrderBar";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+  useEffect(() => {
+    // Scroll Reveal Animation with GSAP
+    const elements = document.querySelectorAll(".scroll-reveal");
+    
+    elements.forEach((el) => {
+      gsap.fromTo(el, 
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1, 
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+
+    // Magnetic Buttons Effect
+    const magneticWraps = document.querySelectorAll('.magnetic-wrap');
+    const handleMouseMove = (e: MouseEvent) => {
+      const wrap = e.currentTarget as HTMLElement;
+      const rect = wrap.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const child = wrap.children[0] as HTMLElement;
+      if (child) {
+        child.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      }
+    };
+    const handleMouseLeave = (e: MouseEvent) => {
+      const wrap = e.currentTarget as HTMLElement;
+      const child = wrap.children[0] as HTMLElement;
+      if (child) {
+        child.style.transform = `translate(0px, 0px)`;
+      }
+    };
+
+    magneticWraps.forEach(wrap => {
+      wrap.addEventListener('mousemove', handleMouseMove as EventListener);
+      wrap.addEventListener('mouseleave', handleMouseLeave as EventListener);
+    });
+
+    return () => {
+      magneticWraps.forEach(wrap => {
+        wrap.removeEventListener('mousemove', handleMouseMove as EventListener);
+        wrap.removeEventListener('mouseleave', handleMouseLeave as EventListener);
+      });
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="relative w-full flex flex-col items-center overflow-x-hidden">
+      <SplashScreen />
+      <Hero />
+      <SearchSection />
+      <CategorySlider />
+      <RestaurantGrid />
+      <RecommendedMeals />
+      <AppOrderBar />
+    </main>
   );
 }
