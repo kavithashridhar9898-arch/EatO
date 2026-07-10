@@ -27,7 +27,7 @@ export function SplashScreen() {
             muted
             playsInline
             onEnded={() => setShow(false)}
-            className="w-full h-full object-cover opacity-90"
+            className="w-full h-full object-contain md:object-cover opacity-90"
           />
           
           <button 
